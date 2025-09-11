@@ -4,6 +4,6 @@ A Machine Learning project to detect Parkinson’s Disease using biomedical voic
 The libraries used in this project are:
 numpy, pandas, seaborn, matplotlib, scikit-learn, xgboost and opendatasets.
 # Running the code
-The code can be run using Visual Studio Code. The dataset that has been loaded is clean. The data then using MinMaxScaler, has been split into training and testing datasets. Then the  different classifiers are trained and  evaluation is done using different metrics likke auuracy, confusion matrix.
+The code can be run using Visual Studio Code. The dataset that has been loaded is clean. The data then using MinMaxScaler, has been split into training and testing datasets. Feature selection is performed using SelectKBest to choose the most relevant voice features. Then the  different classifiers are trained. For Random Forest, GridSearchCV is used for hyperparameter tuning to find the best combination of parameters. Then the evaluation is done using different metrics likke auuracy, confusion matrix.
 #Conclusion
 This project demonstrates that machine learning significantly improves Parkinson’s diagnosis compared to current methods. The Ranfom Forest model achieved the highest accuracy of 94.87%, a critical improvment.
