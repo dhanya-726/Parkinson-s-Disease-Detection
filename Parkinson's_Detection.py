@@ -1,6 +1,6 @@
 # Parkinson's Disease Detection
 
-# ✅ Importing the necessary Libraries
+# Import the necessary Libraries
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -19,25 +19,20 @@ import warnings
 warnings.filterwarnings('ignore')
 sns.set()
 
-# ✅ Install opendatasets and download the dataset
-# pip install opendatasets --quiet
+# Download the dataset
 import opendatasets
 
-username = input("Enter your Kaggle username: ")
-key = input("Enter your Kaggle API key: ")
-{"username": username, "key": key}
+# Download the dataset manually from Kaggle:
+# https://www.kaggle.com/datasets/thecansin/parkinsons-data-set
+#
+# After downloading, place 'parkinsons.data' inside the project folder.
 
-dataset_url = 'https://www.kaggle.com/datasets/thecansin/parkinsons-data-set?datasetId=409297&sortBy=voteCount'
-opendatasets.download(dataset_url)
-
-# ✅ Read data
 data_path = './parkinsons-data-set/parkinsons.data'
 df = pd.read_csv(data_path)
 
-# ✅ Drop name column
 df = df.drop('name', axis=1)
 
-# ✅ Visualize target distribution
+# Visualize target distribution
 df['status'].value_counts().plot(kind='bar')
 plt.title('Distribution of Target variable')
 plt.show()
@@ -46,7 +41,7 @@ df['status'].value_counts().plot(kind='pie', autopct='%.f%%')
 plt.title('Target variable distribution')
 plt.show()
 
-# ✅ Plot function for EDA
+# Plot function
 def plots(plot_kind, dataframe):
     plot_kind = plot_kind.lower()
     plot_func = {
@@ -67,26 +62,24 @@ def plots(plot_kind, dataframe):
     plt.tight_layout()
     plt.show()
 
-# ✅ EDA Plots
 plots('violin', df)
 plots('box', df)
 plots('histogram', df)
 plots('kde', df)
 
-# ✅ Features and target separation
 features = df.drop('status', axis=1)
 target = df['status']
 
-# ✅ Train-Test Split
+# Train-Test Split
 train_data, test_data, train_labels, test_labels = train_test_split(features, target, stratify=target, test_size=0.2, random_state=2)
 
-# ✅ Data Normalization
+# Data Normalization
 scaler = MinMaxScaler()
 scaler.fit(train_data)
 train_data_scaled = scaler.transform(train_data)
 test_data_scaled = scaler.transform(test_data)
 
-# ✅ Optimized Feature Selection for Random Forest
+# Optimized Feature Selection for Random Forest
 from sklearn.feature_selection import SelectKBest, f_classif
 
 feature_range = range(5, len(features.columns) + 1, 2)
@@ -133,7 +126,7 @@ selected_features = selector_optimal.get_support()
 selected_feature_names = [feature_names[i] for i in range(len(feature_names)) if selected_features[i]]
 print(f"\n📋 Selected features ({len(selected_feature_names)}): {selected_feature_names}")
 
-# ✅ Tune RandomForestClassifier with GridSearchCV
+# Tune RandomForestClassifier
 param_grid = {
     'n_estimators': [100, 150, 200],
     'max_depth': [None, 10, 15, 20],
@@ -160,7 +153,6 @@ disp.plot()
 plt.title("Confusion Matrix - Optimized RandomForest")
 plt.show()
 
-# ✅ Testing multiple models with optimal feature selection
 models = [
     SVC(kernel='linear'),
     KNeighborsClassifier(),
@@ -182,12 +174,11 @@ def best_model(model_list):
     return pd.DataFrame(model_results).sort_values(
         by='Model Accuracy Score', ascending=False)
 
-# ✅ Show results
+# Show results
 results_df = best_model(models)
 print("\nModel Accuracy Comparison (with optimized features):")
 print(results_df)
 
-# ✅ Feature importance analysis
 feature_importance = pd.DataFrame({
     'Feature': selected_feature_names,
     'Importance': best_rf_model.feature_importances_
@@ -200,7 +191,6 @@ plt.xlabel('Importance Score')
 plt.tight_layout()
 plt.show()
 
-# ✅ Prediction function for new data
 def predict_parkinsons(input_features):
     new_data = np.array([input_features])
     new_data_scaled = scaler.transform(new_data)
@@ -210,20 +200,10 @@ def predict_parkinsons(input_features):
     result = "Has Parkinson's" if prediction == 1 else "Healthy"
     return result
 
-# ✅ User input prediction
-user_input = input("Enter 22 comma-separated voice features: \n")
-input_features = list(map(float, user_input.split(',')))
-result = predict_parkinsons(input_features)
-print(f"Result: {result}")
+# User input
+if __name__ == "__main__":
+    user_input = input("Enter 22 comma-separated voice features:\n")
+    input_features = list(map(float, user_input.split(',')))
+    result = predict_parkinsons(input_features)
+    print(f"Result: {result}")
 
-"""**Model Result comparison**
-
-🔍 Accuracy of Optimized RandomForest: 94.87%
-
-Model Accuracy Comparison (with optimized features):
-             Model Name  Model Accuracy Score
-   KNeighborsClassifier                 97.44
- RandomForestClassifier                 97.44
-          XGBClassifier                 94.87
-                    SVC                 82.05
-"""
